@@ -6,6 +6,7 @@ import { PrismaModule } from '../prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { HealthModule } from './modules/health/health.module';
+import { CommonModule } from './common/common.module';
 import { envSchema } from './config/env.schema';
 import { SecurityMiddleware } from './common/middleware/security.middleware';
 
@@ -23,6 +24,7 @@ import { SecurityMiddleware } from './common/middleware/security.middleware';
         }
       },
     }),
+    CommonModule,
     PrismaModule,
     AuthModule,
     ThrottlerModule.forRoot([{ ttl: 60_000, limit: 5 }]),

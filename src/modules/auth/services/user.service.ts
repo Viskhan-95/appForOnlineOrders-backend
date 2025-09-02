@@ -5,7 +5,13 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { PasswordService } from './password.service';
-import { RegisterDto } from '../dto/auth.dto';
+import { USER_SELECT_FIELDS } from '../constants/user.constants';
+import type {
+  CreateUserData,
+  UserData,
+  UserWithPassword,
+  UserCredentials,
+} from '../interfaces/user.interfaces';
 
 @Injectable()
 export class UserService {
@@ -14,7 +20,7 @@ export class UserService {
     private readonly passwordService: PasswordService,
   ) {}
 
-  async createUser(input: RegisterDto) {
+  async createUser(input: CreateUserData): Promise<UserData> {
     const existing = await this.prisma.user.findUnique({
       where: { email: input.email },
       select: { id: true },
@@ -39,62 +45,43 @@ export class UserService {
         avatar: input.avatar ?? null,
         restaurantId: input.restaurantId ?? null,
       },
+      select: USER_SELECT_FIELDS.basic,
     });
 
     return user;
   }
 
-  async findUserByEmail(email: string) {
+  async findUserByEmail(email: string): Promise<UserWithPassword | null> {
     return this.prisma.user.findUnique({
       where: { email },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        phone: true,
-        role: true,
-        address: true,
-        avatar: true,
-        restaurantId: true,
-        createdAt: true,
-        updatedAt: true,
-        passwordHash: true,
-      },
+      select: USER_SELECT_FIELDS.withPassword,
     });
   }
 
-  async findUserById(id: string) {
+  async findUserById(id: string): Promise<UserData | null> {
     return this.prisma.user.findUnique({
       where: { id },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        phone: true,
-        role: true,
-        address: true,
-        avatar: true,
-        restaurantId: true,
-        createdAt: true,
-        updatedAt: true,
-      },
+      select: USER_SELECT_FIELDS.basic,
     });
   }
 
-  async validateUserCredentials(email: string, password: string) {
-    const user = await this.findUserByEmail(email);
+  async validateUserCredentials(
+    credentials: UserCredentials,
+  ): Promise<UserData> {
+    const user = await this.findUserByEmail(credentials.email);
     if (!user) {
       throw new UnauthorizedException('Пользователь не найден');
     }
 
     const isValid = await this.passwordService.verifyPassword(
-      password,
+      credentials.password,
       user.passwordHash,
     );
     if (!isValid) {
       throw new UnauthorizedException('Неверные учетные данные');
     }
 
-    return user;
+    const { passwordHash: _passwordHash, ...safeUser } = user;
+    return safeUser;
   }
 }

@@ -19,6 +19,7 @@ import { PasswordResetService } from './services/password-reset.service';
 import { UserService } from './services/user.service';
 import { SessionService } from './services/session.service';
 import { ValidationService } from './services/validation.service';
+import { BaseValidationService } from './services/base-validation.service';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { ValidationService } from './services/validation.service';
     UserService,
     SessionService,
     ValidationService,
+    BaseValidationService,
   ],
   exports: [AuthService, JwtModule],
 })
