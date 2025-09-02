@@ -17,7 +17,6 @@ export class MailerService {
       },
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     this.transporter = nodemailer.createTransport(options);
   }
 

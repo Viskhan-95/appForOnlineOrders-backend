@@ -6,6 +6,8 @@ import {
 } from '@nestjs/platform-fastify';
 import helmet from '@fastify/helmet';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { PrismaExceptionFilter } from './common/filters/prisma-exception.filter';
+import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -13,9 +15,23 @@ async function bootstrap() {
     new FastifyAdapter(),
   );
 
-  await app.register(helmet);
+  await app.register(helmet, {
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'"],
+        imgSrc: ["'self'", 'data:', 'https:'],
+      },
+    },
+    crossOriginEmbedderPolicy: false,
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+  });
   app.enableCors({ origin: true, credentials: true });
   app.setGlobalPrefix('api');
+  app.useGlobalFilters(new PrismaExceptionFilter());
+  app.useGlobalInterceptors(new LoggingInterceptor());
+  // app.useGlobalPipes(new ZodValidationPipe()); // Требует схему в конструкторе
 
   // if (process.env.NODE_ENV !== 'production') {
   const config = new DocumentBuilder()

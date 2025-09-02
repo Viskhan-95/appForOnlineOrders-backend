@@ -9,13 +9,19 @@ import { AuthService } from './auth.service';
 import { PrismaModule } from '../../../prisma/prisma.module';
 import { MailerModule } from '../../common/mailer/mailer.module';
 
+// Новые сервисы
+import { TokenService } from './services/token.service';
+import { PasswordService } from './services/password.service';
+import { RefreshTokenService } from './services/refresh-token.service';
+import { PasswordResetService } from './services/password-reset.service';
+
 @Module({
   imports: [
-    ConfigModule,
     PassportModule,
     PrismaModule,
+    MailerModule,
     JwtModule.registerAsync({
-      imports: [ConfigModule, MailerModule],
+      imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         secret: config.get<string>('JWT_ACCESS_SECRET'),
@@ -26,7 +32,14 @@ import { MailerModule } from '../../common/mailer/mailer.module';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
+  providers: [
+    AuthService,
+    JwtStrategy,
+    TokenService,
+    PasswordService,
+    RefreshTokenService,
+    PasswordResetService,
+  ],
   exports: [AuthService, JwtModule],
 })
 export class AuthModule {}
