@@ -9,11 +9,16 @@ import { AuthService } from './auth.service';
 import { PrismaModule } from '../../../prisma/prisma.module';
 import { MailerModule } from '../../common/mailer/mailer.module';
 
-// Новые сервисы
+// Основные сервисы
 import { TokenService } from './services/token.service';
 import { PasswordService } from './services/password.service';
 import { RefreshTokenService } from './services/refresh-token.service';
 import { PasswordResetService } from './services/password-reset.service';
+
+// Новые сервисы
+import { UserService } from './services/user.service';
+import { SessionService } from './services/session.service';
+import { ValidationService } from './services/validation.service';
 
 @Module({
   imports: [
@@ -39,6 +44,9 @@ import { PasswordResetService } from './services/password-reset.service';
     PasswordService,
     RefreshTokenService,
     PasswordResetService,
+    UserService,
+    SessionService,
+    ValidationService,
   ],
   exports: [AuthService, JwtModule],
 })

@@ -8,6 +8,7 @@ import helmet from '@fastify/helmet';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { PrismaExceptionFilter } from './common/filters/prisma-exception.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
+import { ValidationPipe } from './common/pipes/validation.pipe';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -31,7 +32,7 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   app.useGlobalFilters(new PrismaExceptionFilter());
   app.useGlobalInterceptors(new LoggingInterceptor());
-  // app.useGlobalPipes(new ZodValidationPipe()); // Требует схему в конструкторе
+  app.useGlobalPipes(new ValidationPipe());
 
   // if (process.env.NODE_ENV !== 'production') {
   const config = new DocumentBuilder()
