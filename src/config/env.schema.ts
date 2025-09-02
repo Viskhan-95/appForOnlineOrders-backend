@@ -28,6 +28,41 @@ export const envSchema = z.object({
   SMTP_PASS: z.string().min(1),
   SMTP_FROM: z.string().email().optional(),
 
+  // Redis
+  REDIS_HOST: z.string().default('localhost'),
+  REDIS_PORT: z
+    .string()
+    .default('6379')
+    .transform(Number)
+    .pipe(z.number().min(1).max(65535)),
+  REDIS_PASSWORD: z.string().optional(),
+  REDIS_DB: z
+    .string()
+    .default('0')
+    .transform(Number)
+    .pipe(z.number().min(0).max(15)),
+  REDIS_KEY_PREFIX: z.string().default('online_orders:'),
+  REDIS_TTL_USER: z
+    .string()
+    .default('3600')
+    .transform(Number)
+    .pipe(z.number().min(60)),
+  REDIS_TTL_SESSION: z
+    .string()
+    .default('1800')
+    .transform(Number)
+    .pipe(z.number().min(60)),
+  REDIS_TTL_AUTH: z
+    .string()
+    .default('300')
+    .transform(Number)
+    .pipe(z.number().min(60)),
+  REDIS_TTL_GENERAL: z
+    .string()
+    .default('600')
+    .transform(Number)
+    .pipe(z.number().min(60)),
+
   // App
   PORT: z
     .string()
