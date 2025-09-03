@@ -15,7 +15,7 @@ export class RegisterDto {
   @IsEmail({}, { message: 'Некорректный формат email' })
   email: string;
 
-  @ApiProperty({ description: 'Пароль пользователя', minLength: 8 })
+  @ApiProperty({ description: 'Пароль пользователя', minLength: 6 })
   @IsString({ message: 'Пароль должен быть строкой' })
   @MinLength(6, { message: 'Пароль должен содержать минимум 6 символов' })
   @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/, {
@@ -79,26 +79,7 @@ export class RefreshTokenDto {
   refreshToken: string;
 }
 
-export class RequestResetDto {
-  @ApiProperty({ description: 'Email пользователя' })
-  @IsEmail({}, { message: 'Некорректный формат email' })
-  email: string;
-}
-
-export class ResetPasswordDto {
-  @ApiProperty({ description: 'Токен для сброса пароля' })
-  @IsString({ message: 'Токен должен быть строкой' })
-  token: string;
-
-  @ApiProperty({ description: 'Новый пароль', minLength: 8 })
-  @IsString({ message: 'Пароль должен быть строкой' })
-  @MinLength(6, { message: 'Пароль должен содержать минимум 6 символов' })
-  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/, {
-    message:
-      'Пароль должен содержать: строчные и заглавные буквы, цифры и специальные символы',
-  })
-  newPassword: string;
-}
+// Удалены DTO для ссылочного сброса пароля
 
 export class RegisterStartDto {
   @IsEmail() email: string;
@@ -129,5 +110,5 @@ export class ResetVerifyOtpDto {
 
 export class ResetConfirmWithTokenDto {
   @IsString() resetToken: string;
-  @IsString() @MinLength(8) newPassword: string;
+  @IsString() @MinLength(6) newPassword: string;
 }

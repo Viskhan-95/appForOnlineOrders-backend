@@ -9,7 +9,11 @@ export default registerAs('redis', () => ({
   ttl: {
     user: parseInt(process.env.REDIS_TTL_USER ?? '3600', 10) || 3600, // 1 час
     session: parseInt(process.env.REDIS_TTL_SESSION ?? '1800', 10) || 1800, // 30 минут
-    auth: parseInt(process.env.REDIS_TTL_AUTH ?? '300', 10) || 300, // 5 минут
+    auth:
+      parseInt(
+        process.env.REDIS_TTL_AUTH ?? process.env.OTP_TTL_SEC ?? '300',
+        10,
+      ) || 300, // 5 минут/из env
     general: parseInt(process.env.REDIS_TTL_GENERAL ?? '600', 10) || 600, // 10 минут
   },
 }));

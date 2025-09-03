@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { UserService } from './user.service';
 import { RedisService } from '../../../common/cache/redis.service';
+import { PasswordService } from './password.service';
 import type {
   UserData,
   UserWithPassword,
@@ -15,6 +16,7 @@ export class CachedUserService {
   constructor(
     private readonly userService: UserService,
     private readonly redisService: RedisService,
+    private readonly passwordService: PasswordService,
   ) {}
 
   /**
@@ -55,11 +57,15 @@ export class CachedUserService {
     // Если нет в кэше, получаем из БД
     const user = await this.userService.findUserByEmail(email);
     if (user) {
-      // Кэшируем результат
-      await this.redisService.set(cacheKey, user, 'user');
+      const { passwordHash: _passwordHash, ...safeUser } = user;
+      await this.redisService.set(
+        cacheKey,
+        safeUser as unknown as UserWithPassword,
+        'user',
+      );
       await this.redisService.set(
         this.redisService.generateKey('user:id', user.id),
-        user,
+        safeUser,
         'user',
       );
       this.logger.debug(`User cached by email: ${email}`);
@@ -109,7 +115,7 @@ export class CachedUserService {
     }
 
     // Валидация пароля
-    const isValid = await this.userService['passwordService'].verifyPassword(
+    const isValid = await this.passwordService.verifyPassword(
       credentials.password,
       user.passwordHash,
     );

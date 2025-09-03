@@ -2,7 +2,7 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 
 @Injectable()
 export class ValidationService {
-  private readonly PASSWORD_MIN_LENGTH = 8;
+  private readonly PASSWORD_MIN_LENGTH = 6;
   private readonly PASSWORD_REGEX =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/;
 

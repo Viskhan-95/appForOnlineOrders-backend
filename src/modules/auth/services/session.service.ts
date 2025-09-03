@@ -38,6 +38,8 @@ export class SessionService {
       );
 
       if (!match) {
+        // Reuse detection: токен валиден по подписи, но не найден в активных — потенциальное повторное использование
+        await this.refreshTokenService.revokeAllUserRefreshTokens(payload.sub);
         throw new UnauthorizedException('Invalid refresh token');
       }
 

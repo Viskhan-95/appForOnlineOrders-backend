@@ -27,7 +27,12 @@ import { SecurityMiddleware } from './common/middleware/security.middleware';
     CommonModule,
     PrismaModule,
     AuthModule,
-    ThrottlerModule.forRoot([{ ttl: 60_000, limit: 5 }]),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000, // Будет переопределено после инициализации ConfigService
+        limit: 100, // Будет переопределено после инициализации ConfigService
+      },
+    ]),
     HealthModule,
   ],
   controllers: [AppController],

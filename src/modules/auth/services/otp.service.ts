@@ -5,7 +5,10 @@ import { randomBytes } from 'node:crypto';
 
 @Injectable()
 export class OtpService {
-  private readonly registerTtlSec = 10 * 60;
+  private readonly registerTtlSec = Number(process.env.OTP_TTL_SEC ?? 600);
+  private readonly resendCooldownSec = Number(
+    process.env.OTP_RESEND_COOLDOWN_SEC ?? 60,
+  );
   private readonly maxAttempts = 5;
 
   constructor(
@@ -23,10 +26,18 @@ export class OtpService {
   private attemptsKey(email: string) {
     return this.redis.generateKey('otp:register:attempts', email);
   }
+  private resendKey(email: string) {
+    return this.redis.generateKey('otp:register:resend', email);
+  }
 
   async sendRegisterCode(email: string): Promise<void> {
+    // защитимся от частых resend
+    const resendKey = this.resendKey(email);
+    const already = await this.redis.get<string>(resendKey);
+    if (already) return; // молча игнорируем слишком частые запросы
     const code = this.generateCode();
     await this.redis.set(this.key(email), code, 'auth');
+    await this.redis.set(resendKey, '1', this.resendCooldownSec);
     await this.mailer.sendOtpCode(email, code, 'register');
   }
 
@@ -60,13 +71,20 @@ export class OtpService {
   private resetAttemptsKey(email: string) {
     return this.redis.generateKey('otp:reset:attempts', email);
   }
+  private resetResendKey(email: string) {
+    return this.redis.generateKey('otp:reset:resend', email);
+  }
   private resetTokenKey(token: string) {
     return this.redis.generateKey('reset:token', token);
   }
 
   async sendResetCode(email: string): Promise<void> {
+    const resendKey = this.resetResendKey(email);
+    const already = await this.redis.get<string>(resendKey);
+    if (already) return;
     const code = this.generateCode();
     await this.redis.set(this.resetKey(email), code, 'auth');
+    await this.redis.set(resendKey, '1', this.resendCooldownSec);
     await this.mailer.sendOtpCode(email, code, 'reset');
   }
 

@@ -73,6 +73,39 @@ export const envSchema = z.object({
     .enum(['development', 'production', 'test'])
     .default('development'),
   APP_URL: z.string().url().default('http://localhost:3000'),
+  // CORS/Swagger/Body
+  CORS_ORIGIN: z.string().optional(),
+  SWAGGER_ENABLED: z
+    .string()
+    .optional()
+    .transform((v) => (v === undefined ? undefined : v === 'true')),
+  BODY_LIMIT_BYTES: z
+    .string()
+    .default('1000000')
+    .transform(Number)
+    .pipe(z.number().min(1024)),
+  // Global throttling
+  THROTTLE_GLOBAL_TTL_MS: z
+    .string()
+    .default('60000')
+    .transform(Number)
+    .pipe(z.number().min(1000)),
+  THROTTLE_GLOBAL_LIMIT: z
+    .string()
+    .default('100')
+    .transform(Number)
+    .pipe(z.number().min(1)),
+  // OTP settings
+  OTP_TTL_SEC: z
+    .string()
+    .default('600')
+    .transform(Number)
+    .pipe(z.number().min(60)),
+  OTP_RESEND_COOLDOWN_SEC: z
+    .string()
+    .default('60')
+    .transform(Number)
+    .pipe(z.number().min(10)),
 });
 
 export type EnvConfig = z.infer<typeof envSchema>;
