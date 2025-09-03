@@ -147,3 +147,4 @@ docker exec -it online_orders_redis redis-cli INFO memory
 - [Redis Documentation](https://redis.io/documentation)
 - [Redis Commander](https://github.com/joeferner/redis-commander)
 - [Redis Best Practices](https://redis.io/topics/optimization)
+

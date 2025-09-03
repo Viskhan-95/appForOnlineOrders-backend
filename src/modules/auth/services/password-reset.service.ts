@@ -82,6 +82,25 @@ export class PasswordResetService {
     ]);
   }
 
+  async resetWithKnownEmail(email: string, newPassword: string): Promise<void> {
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+      select: { id: true },
+    });
+    if (!user) return;
+    const passwordHash = await this.passwordService.hashPassword(newPassword);
+    await this.prisma.$transaction([
+      this.prisma.user.update({
+        where: { id: user.id },
+        data: { passwordHash },
+      }),
+      this.prisma.refreshToken.updateMany({
+        where: { userId: user.id, revokedAt: null },
+        data: { revokedAt: new Date() },
+      }),
+    ]);
+  }
+
   // Эти методы теперь в TokenService
   // private generateResetToken(): string {
   //   const { randomBytes } = require('node:crypto');

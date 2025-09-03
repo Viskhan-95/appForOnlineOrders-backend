@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
+import type { Prisma, Role } from '@prisma/client';
 
 @Injectable()
 export class PrismaQueryOptimizerService {
@@ -19,7 +20,7 @@ export class PrismaQueryOptimizerService {
     const skip = (page - 1) * limit;
 
     // Базовый where для фильтрации
-    const where: any = {};
+    const where: Prisma.UserWhereInput = {};
 
     if (search) {
       where.OR = [
@@ -29,7 +30,7 @@ export class PrismaQueryOptimizerService {
     }
 
     if (role) {
-      where.role = role;
+      where.role = role as Role;
     }
 
     // Параллельные запросы для оптимизации
@@ -99,7 +100,9 @@ export class PrismaQueryOptimizerService {
   /**
    * Batch операции для массового обновления
    */
-  async batchUpdateUsers(updates: Array<{ id: string; data: any }>) {
+  async batchUpdateUsers(
+    updates: Array<{ id: string; data: Prisma.UserUpdateInput }>,
+  ) {
     const transactions = updates.map(({ id, data }) =>
       this.prisma.user.update({
         where: { id },
@@ -116,11 +119,11 @@ export class PrismaQueryOptimizerService {
    */
   async findUsersByMultipleCriteria(criteria: {
     emails?: string[];
-    roles?: string[];
+    roles?: Role[];
     createdAfter?: Date;
     createdBefore?: Date;
   }) {
-    const where: any = {};
+    const where: Prisma.UserWhereInput = {};
 
     if (criteria.emails && criteria.emails.length > 0) {
       where.email = { in: criteria.emails };

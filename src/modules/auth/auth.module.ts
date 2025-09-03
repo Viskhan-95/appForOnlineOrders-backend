@@ -14,6 +14,7 @@ import { TokenService } from './services/token.service';
 import { PasswordService } from './services/password.service';
 import { RefreshTokenService } from './services/refresh-token.service';
 import { PasswordResetService } from './services/password-reset.service';
+import { OtpService } from './services/otp.service';
 
 // Новые сервисы
 import { UserService } from './services/user.service';
@@ -45,6 +46,7 @@ import { BaseValidationService } from './services/base-validation.service';
     PasswordService,
     RefreshTokenService,
     PasswordResetService,
+    OtpService,
     UserService,
     SessionService,
     ValidationService,

@@ -76,4 +76,12 @@ export class AuthService {
     this.baseValidationService.validatePassword(newPassword);
     await this.passwordResetService.resetConfirm(token, newPassword);
   }
+
+  async resetConfirmTokenKnownEmail(
+    email: string,
+    newPassword: string,
+  ): Promise<void> {
+    this.baseValidationService.validatePassword(newPassword);
+    await this.passwordResetService.resetWithKnownEmail(email, newPassword);
+  }
 }

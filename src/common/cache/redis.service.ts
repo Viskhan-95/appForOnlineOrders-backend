@@ -1,6 +1,6 @@
 import { Injectable, Inject, Logger } from '@nestjs/common';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Cache } from 'cache-manager';
+import type { Cache } from 'cache-manager';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
@@ -49,12 +49,15 @@ export class RedisService {
   /**
    * Установить значение в кэш
    */
-  async set(key: string, value: unknown, ttl?: string): Promise<void> {
+  async set(key: string, value: unknown, ttl?: string | number): Promise<void> {
     try {
       const fullKey = this.buildKey(key);
-      const cacheTtl = ttl
-        ? this.ttl[ttl] || this.ttl.general
-        : this.ttl.general;
+      const cacheTtl =
+        typeof ttl === 'number'
+          ? ttl
+          : ttl
+            ? this.ttl[ttl] || this.ttl.general
+            : this.ttl.general;
 
       await this.cacheManager.set(fullKey, value, cacheTtl);
       this.logger.debug(`Cache set: ${fullKey} (TTL: ${cacheTtl}s)`);
@@ -81,8 +84,17 @@ export class RedisService {
    */
   async reset(): Promise<void> {
     try {
-      await this.cacheManager.reset();
-      this.logger.log('Cache reset completed');
+      const maybeReset = (
+        this.cacheManager as unknown as {
+          reset?: () => void | Promise<void>;
+        }
+      ).reset;
+      if (typeof maybeReset === 'function') {
+        await maybeReset();
+        this.logger.log('Cache reset completed');
+      } else {
+        this.logger.warn('Cache reset is not supported by the current store');
+      }
     } catch (error) {
       this.logger.error('Error resetting cache:', error);
     }
@@ -91,12 +103,8 @@ export class RedisService {
   /**
    * Получить статистику кэша
    */
-  async getStats(): Promise<Record<string, unknown>> {
+  getStats(): Record<string, unknown> {
     try {
-      const store = this.cacheManager.store;
-      if (store && typeof store.getStats === 'function') {
-        return store.getStats();
-      }
       return { message: 'Stats not available for this cache store' };
     } catch (error) {
       this.logger.error('Error getting cache stats:', error);

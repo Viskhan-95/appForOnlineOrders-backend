@@ -6,6 +6,7 @@ import {
   MinLength,
   MaxLength,
   Matches,
+  Length,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
@@ -16,7 +17,7 @@ export class RegisterDto {
 
   @ApiProperty({ description: 'Пароль пользователя', minLength: 8 })
   @IsString({ message: 'Пароль должен быть строкой' })
-  @MinLength(8, { message: 'Пароль должен содержать минимум 8 символов' })
+  @MinLength(6, { message: 'Пароль должен содержать минимум 6 символов' })
   @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/, {
     message:
       'Пароль должен содержать: строчные и заглавные буквы, цифры и специальные символы',
@@ -91,10 +92,42 @@ export class ResetPasswordDto {
 
   @ApiProperty({ description: 'Новый пароль', minLength: 8 })
   @IsString({ message: 'Пароль должен быть строкой' })
-  @MinLength(8, { message: 'Пароль должен содержать минимум 8 символов' })
+  @MinLength(6, { message: 'Пароль должен содержать минимум 6 символов' })
   @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/, {
     message:
       'Пароль должен содержать: строчные и заглавные буквы, цифры и специальные символы',
   })
   newPassword: string;
+}
+
+export class RegisterStartDto {
+  @IsEmail() email: string;
+}
+export class RegisterVerifyDto {
+  @IsEmail() email: string;
+  @IsString() @Length(6, 6) code: string;
+  // поля для регистрации после верификации:
+  @IsString() name: string;
+  @IsString() password: string;
+  @IsString() phone: string;
+  @IsOptional() @IsString() address?: string;
+  @IsOptional() @IsString() avatar?: string;
+  @IsOptional() @IsEnum(['SUPERADMIN', 'ADMIN', 'USER']) role?:
+    | 'SUPERADMIN'
+    | 'ADMIN'
+    | 'USER';
+}
+
+export class ResetStartOtpDto {
+  @IsEmail() email: string;
+}
+
+export class ResetVerifyOtpDto {
+  @IsEmail() email: string;
+  @IsString() @Length(6, 6) code: string;
+}
+
+export class ResetConfirmWithTokenDto {
+  @IsString() resetToken: string;
+  @IsString() @MinLength(8) newPassword: string;
 }

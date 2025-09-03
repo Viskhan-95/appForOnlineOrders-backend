@@ -19,3 +19,4 @@ echo "💾 Данные Redis сохранены в volume redis_data"
 echo ""
 echo "Для полного удаления данных выполните:"
 echo "docker-compose -f docker-compose.redis.yml down -v"
+

@@ -30,4 +30,22 @@ export class MailerService {
                 <p>Если вы не запрашивали восстановление — игнорируйте письмо.</p>`,
     });
   }
+
+  async sendOtpCode(
+    to: string,
+    code: string,
+    purpose: 'register' | 'reset',
+  ): Promise<void> {
+    const subject =
+      purpose === 'register'
+        ? 'Код для регистрации'
+        : 'Код для восстановления пароля';
+    const html = `<p>Ваш код: <b>${code}</b></p><p>Срок действия: 10 минут</p>`;
+    await this.transporter.sendMail({
+      from: process.env.SMTP_FROM ?? process.env.SMTP_USER,
+      to,
+      subject,
+      html,
+    });
+  }
 }

@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { UserService } from './user.service';
-import { RedisService } from '../../common/cache/redis.service';
+import { RedisService } from '../../../common/cache/redis.service';
 import type {
   UserData,
   UserWithPassword,

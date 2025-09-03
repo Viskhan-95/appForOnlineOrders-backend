@@ -41,3 +41,4 @@ else
     docker-compose -f docker-compose.redis.yml logs
     exit 1
 fi
+
